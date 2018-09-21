@@ -81,7 +81,7 @@ class EpubitSpider(scrapy.Spider):
         item['origin_book_isbn'] = None
         item['avatar'] = 'https://www.epubit.com/oldres/writeBookImg/' + res.get('id')
         item['tags'] = self.get_tags_text(res.get('categoryFullName'))
-        item['book_url'] = response.request.url
+        item['book_url'] = response.request.url + '?id=' + res.get('id')
         item['website'] = '异步社区'
         yield item
 
