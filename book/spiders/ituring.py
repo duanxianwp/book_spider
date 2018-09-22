@@ -26,7 +26,6 @@ class IturingSpider(scrapy.Spider):
             return
         for a in hrefs:
             href = self.start_urls[0][:-1] + a.get('href')
-            print(href)
             yield scrapy.Request(url=href, callback=self.parse_book_info)
             # 判断是否要继续往下一页爬
 
