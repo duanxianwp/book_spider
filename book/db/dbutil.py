@@ -1,11 +1,22 @@
 from peewee import *
-from book import settings
+from book.db.redisutil import *
 
 
 # 判断书是否已存在
 def is_exist(url):
     db = DBHelper()
     return db.is_exist(url)
+
+
+def is_exist_isbn(isbn):
+    db = DBHelper()
+    return db.is_exist_isbn(isbn)
+
+
+# 查出所有的可用用户
+def get_all_able_user():
+    db = DBHelper()
+    return db.get_all_able_user()
 
 
 db = MySQLDatabase(settings.MYSQL_DATABASE, user=settings.MYSQL_USERNAME, passwd=settings.MYSQL_PASSWORD,
@@ -41,11 +52,19 @@ class Book_Detail(Base_Model):
     #     database = settings.MYSQL_TABLE
 
 
+class User(Base_Model):
+    name = CharField()
+    phone = CharField()
+    email = CharField()
+    status = BitField()
+
+
 class DBHelper(object):
 
     @staticmethod
     def update_data(data):
-        if is_exist(data.get('book_url')):
+
+        if is_exist(data.get('book_url')) and is_exist_isbn(data.get('isbn')):
             return
         book = Book_Detail(book_name=data.get('book_name'),
                            author=data.get('author'), translator=data.get('translator'),
@@ -56,12 +75,35 @@ class DBHelper(object):
                            format=data.get('format'), introduction=data.get('introduction'),
                            origin_book_isbn=data.get('origin_book_isbn'), avatar=data.get('avatar'),
                            tags=data.get('tags'), book_url=data.get('book_url'), website=data.get('website'))
-        # 存储数据到redis队列中
-        book.save()
+        try:
+            book.save()
+            # 存储数据到redis队列中
+            sadd(data)
+        except Exception as e:
+            print(data['author'])
+            pass
 
     @staticmethod
     def is_exist(url):
         res = Book_Detail.select().where(Book_Detail.book_url == url)
+        if res:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def is_exist_isbn(isbn):
+        if isbn is None:
+            return False
+        res = Book_Detail.select().where(Book_Detail.isbn == isbn)
+        if res:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def get_all_able_user():
+        res = User.select().where(User.status == 1)
         if res:
             return True
         else:

@@ -38,7 +38,7 @@ class BroadviewSpider(scrapy.Spider):
         soup = BeautifulSoup(response.text, 'lxml')
         item = BookItem()
         item['book_name'] = self.get_text(soup.select_one('h2.book-name'))
-        item['author'] = soup.select_one('p.book-author').text.strip().split('(')[0].strip()
+        item['author'] = soup.select_one('p.book-author').text.strip().split('(')[0].strip().replace('\n','').replace(' ','').strip()
         item['translator'] = self.get_list_one_text(
             re.findall(re.compile('<a.*>(.*?)\\s+</a>\\s+\(译者\)'), response.text))
         item['editor'] = self.get_list_one_text(re.findall(re.compile('维护人：\\S+<a.*>(.*?)</a>'), response.text))
@@ -60,6 +60,9 @@ class BroadviewSpider(scrapy.Spider):
         item['tags'] = self.get_tags_text(soup.select('div.block-tag > div.block-body > ul > li > a'))
         item['book_url'] = response.request.url
         item['website'] = '博文视点'
+        #特殊处理
+        if str(item['isbn']).strip() == '':
+            item['isbn'] = None
         yield item
 
     @staticmethod
