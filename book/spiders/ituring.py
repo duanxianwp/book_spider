@@ -60,6 +60,10 @@ class IturingSpider(scrapy.Spider):
         item['tags'] = json.dumps(re.findall(re.compile('post-tag">(.*?)</a>'), response.text))
         item['book_url'] = response.request.url
         item['website'] = '图灵社区'
+
+        # 特殊逻辑
+        if item['isbn'] == '暂无':
+            item['isbn'] = None
         yield item
 
     @staticmethod
