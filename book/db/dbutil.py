@@ -80,6 +80,8 @@ class DBHelper(object):
             # 存储数据到redis队列中
             sadd(data)
         except Exception as e:
+            # print(e)
+            # print(data)
             pass
 
     @staticmethod
