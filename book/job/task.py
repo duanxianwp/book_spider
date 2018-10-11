@@ -1,7 +1,7 @@
 import os
 from book.db import redisutil, dbutil
 
-cmd = '../../book_spider.sh'
+cmd = './book_spider.sh'
 
 
 def spider_job():
