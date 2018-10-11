@@ -6,7 +6,7 @@ from book.job import task
 schedule.every().day.at("23:50").do(task.clean_job)
 # 执行爬虫job
 schedule.every().day.at("00:00").do(task.spider_job)
-# 执行爬虫job
+# 执行推送job
 schedule.every().day.at("08:00").do(task.push_every_day_books)
 
 while True:
