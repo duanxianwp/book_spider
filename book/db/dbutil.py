@@ -106,6 +106,6 @@ class DBHelper(object):
     def get_all_able_user():
         res = User.select().where(User.status == 1)
         if res:
-            return True
+            return res
         else:
-            return False
+            raise Exception("users is None")
