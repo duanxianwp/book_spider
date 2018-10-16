@@ -56,7 +56,7 @@ class User(Base_Model):
     name = CharField()
     phone = CharField()
     email = CharField()
-    status = BitField()
+    status = IntegerField()
 
 
 class DBHelper(object):
@@ -78,7 +78,7 @@ class DBHelper(object):
         try:
             book.save()
             # 存储数据到redis队列中
-            sadd(data)
+            lpush(data)
         except Exception as e:
             # print(e)
             # print(data)

@@ -12,7 +12,7 @@ def push_email(recieve_email, message):
         user = settings.EMAIL_USER
         password = settings.EMAIL_PASSWORD
         mail_content = message
-        mail_title = '新书推送'
+        mail_title = '新书快讯'
 
         msg = MIMEText(mail_content, "html", 'utf-8')
         msg["Subject"] = Header(mail_title, 'utf-8')
@@ -26,5 +26,7 @@ def push_email(recieve_email, message):
         smtp.send_message(msg, user, recieve_email)
         smtp.quit()
         return True
-    except Exception:
+    except Exception as e:
+        print("failed,Exception:")
+        print(e)
         return False

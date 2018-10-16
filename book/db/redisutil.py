@@ -6,12 +6,16 @@ pool = redis.ConnectionPool(host=settings.REDIS_HOST, port=settings.REDIS_PORT,
 r = redis.StrictRedis(connection_pool=pool)
 
 
-def sadd(data):
-    r.sadd("book", data)
+def lpush(data):
+    r.lpush("book", data)
 
 
-def smembers():
-    return r.smembers("book")
+def keys_num():
+    return r.llen("book")
+
+
+def lrange():
+    return r.lrange("book", 0, keys_num())
 
 
 def spop():
