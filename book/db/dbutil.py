@@ -1,11 +1,18 @@
 from peewee import *
 from book.db.redisutil import *
+from playhouse.db_url import connect
+import time
 
 
 # 判断书是否已存在
 def is_exist(url):
     db = DBHelper()
     return db.is_exist(url)
+
+
+def is_no_exist(no):
+    db = DBHelper()
+    return db.is_no_exist(no)
 
 
 def is_exist_isbn(isbn):
@@ -19,9 +26,9 @@ def get_all_able_user():
     return db.get_all_able_user()
 
 
-db = MySQLDatabase(settings.MYSQL_DATABASE, user=settings.MYSQL_USERNAME, passwd=settings.MYSQL_PASSWORD,
-                   host=settings.MYSQL_HOST, port=settings.MYSQL_PORT, charset='utf8')
-
+#db = MySQLDatabase(settings.MYSQL_DATABASE, user=settings.MYSQL_USERNAME, passwd=settings.MYSQL_PASSWORD,
+#                   host=settings.MYSQL_HOST, port=settings.MYSQL_PORT, charset='utf8')
+db = connect("mysql+pool://{}:{}@{}:{}/{}?charset=utf8&max_connections=20&stale_timeout=300".format(settings.MYSQL_USERNAME,settings.MYSQL_PASSWORD,settings.MYSQL_HOST,settings.MYSQL_PORT,settings.MYSQL_DATABASE))
 
 class Base_Model(Model):
     class Meta:
@@ -50,6 +57,19 @@ class Book_Detail(Base_Model):
 
     # class Meta:
     #     database = settings.MYSQL_TABLE
+
+
+class Bus(Base_Model):
+    title = CharField()
+    no = CharField()
+    publish_date = CharField()
+    time = CharField()
+    maker = CharField()
+    category = CharField()
+    actors = CharField()
+    photo = CharField()
+    magent = CharField()
+    url = CharField()
 
 
 class User(Base_Model):
@@ -93,6 +113,14 @@ class DBHelper(object):
             return False
 
     @staticmethod
+    def is_no_exist(no):
+        res = Bus.select().where(Bus.no == no)
+        if res:
+            return True
+        else:
+            return False
+
+    @staticmethod
     def is_exist_isbn(isbn):
         if isbn is None:
             return False
@@ -103,9 +131,32 @@ class DBHelper(object):
             return False
 
     @staticmethod
+    def get_today_books():
+        date = time.time()
+        date = date - date%86400
+        Book_Detail.select().where(Book_Detail.update > date)
+
+    @staticmethod
     def get_all_able_user():
         res = User.select().where(User.status == 1)
         if res:
             return res
         else:
             raise Exception("users is None")
+
+    @staticmethod
+    def insert_movie(data):
+        if is_no_exist(data.get('no')):
+            return
+        bus = Bus(title=data.get('title'),
+                  no=data.get('no'), publish_date=data.get('publish_date'),
+                  time=data.get('time'), maker=data.get('maker'),
+                  category=data.get('category'), actors=data.get('actors'),
+                  photo=data.get('photo'), magent=data.get('magent'),
+                  url=data.get("url"))
+        try:
+            bus.save()
+        except Exception as e:
+            # print(e)
+            # print(data)
+            pass

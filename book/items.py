@@ -28,3 +28,16 @@ class BookItem(scrapy.Item):
     tags = Field()
     book_url = Field()
     website = Field()
+
+
+class BusItem(scrapy.Item):
+    title = Field()
+    no = Field()
+    publish_date = Field()
+    time = Field()
+    maker = Field()
+    category = Field()
+    actors = Field()
+    photo = Field()
+    magent = Field()
+    url = Field()

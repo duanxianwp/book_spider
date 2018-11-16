@@ -23,4 +23,5 @@ class MysqlPipeline(object):
 
     def process_item(self, item, spider):
         self.client.update_data(item)
+       # self.client.insert_movie(item)
         return item

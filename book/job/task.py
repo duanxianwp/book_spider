@@ -14,7 +14,9 @@ def clean_job():
 
 
 def push_every_day_books():
-    books = redisutil.lrange()
+    #books = redisutil.lrange()
+    # book 从mysql里查，redis 老超时
+    books = dbutil.get_today_books()
     users = dbutil.get_all_able_user()
     if not users or not books:
         return
